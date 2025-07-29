@@ -24,6 +24,12 @@ containers.forEach(container => {
         page: window.location.pathname.split('/').pop(),
         cookie: document.cookie,
         is_bot: 'disabled'
+        // Need add
+        // is_proxy = false || true || disabled
+        // is_vpn = false || true || disabled
+        // is_tor = false || true || disabled
+        // network_fraud_score = 0 - 100
+        // network_fraud_risk = low || medium || hi
     }
 
     container.querySelectorAll('[metric-input]').forEach(el => {
