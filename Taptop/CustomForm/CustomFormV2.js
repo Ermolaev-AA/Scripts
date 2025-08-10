@@ -1,4 +1,4 @@
-const FETCH_URL = 'http://localhost:4848/customers'
+const FETCH_URL = 'https://api.onycs.ru/customers'
 
 function delay(ms) {
     return new Promise(res => setTimeout(res, ms))
