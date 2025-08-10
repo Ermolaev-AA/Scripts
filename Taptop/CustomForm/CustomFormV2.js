@@ -1,4 +1,4 @@
-const FETCH_URL = 'http://api.onycs.ru/customers'
+const FETCH_URL = 'https://api.onycs.ru/customers'
 
 function waitForClass(el, className, timeout = 20000) {
     return new Promise((resolve, reject) => {
