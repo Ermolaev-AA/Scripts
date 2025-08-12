@@ -39,6 +39,7 @@ function waitForClass(el, className, timeout = 20000) {
 
 async function fetchCustomerPayload({ name, phone, url, cookie }) {
     const DEFAULTS = {
+        externalId: 'disabled',
         isFraud: 'disabled',
         isLocalDuplicate: 'disabled',
         isGlobalDuplicate: 'disabled',
@@ -65,6 +66,7 @@ async function fetchCustomerPayload({ name, phone, url, cookie }) {
         if (!customer) return DEFAULTS
 
         return {
+            externalId: customer?._id ?? DEFAULTS.externalId,
             isFraud: customer?.is_fraud ?? DEFAULTS.isFraud,
             isLocalDuplicate: customer?.is_local_duplicate ?? DEFAULTS.isLocalDuplicate,
             isGlobalDuplicate: customer?.is_global_duplicate ?? DEFAULTS.isGlobalDuplicate,
@@ -79,6 +81,7 @@ async function fetchCustomerPayload({ name, phone, url, cookie }) {
 
 function applyValuesToInputs(input, payload) {
     if (!input) return
+    if (input.external_id) input.external_id.value = payload.externalId
     if (input.is_fraud) input.is_fraud.value = payload.isFraud
     if (input.is_local_duplicate) input.is_local_duplicate.value = payload.isLocalDuplicate
     if (input.is_global_duplicate) input.is_global_duplicate.value = payload.isGlobalDuplicate
@@ -142,6 +145,7 @@ containers.forEach(container => {
         domain: new URL(window.location.href).hostname,
         page: window.location.pathname.split('/').pop() || '',
         cookie: document.cookie,
+        external_id: 'disabled',
         is_fraud: 'disabled',
         is_local_duplicate: 'disabled',
         is_global_duplicate: 'disabled',
