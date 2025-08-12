@@ -181,59 +181,122 @@ containers.forEach(container => {
     if (redirectAttr) gatePreSubmit(container, input)
 })
 
-function gatePreSubmit(container, input) {
-    const form = container.querySelector('form')
-    if (!form) return
+// Хелпер: переключает состояние "идёт отправка"
+function setSubmitting(form, on) {
+    const submits = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+    submits.forEach(btn => {
+        btn.disabled = !!on;
+        btn.setAttribute('aria-busy', on ? 'true' : 'false');
+        btn.classList.toggle('is-loading', !!on);
 
-    form.addEventListener('click', e => {
-        const t = e.target
-        if (t && (t.matches('button[type="submit"]') || t.matches('input[type="submit"]'))) {
-            form._submitter = t
+        // Небольшой UX: меняем текст на кнопке <button>
+        if (btn.tagName === 'BUTTON') {
+            if (on) {
+                if (btn._oldText == null) btn._oldText = btn.textContent;
+                btn.textContent = btn.getAttribute('data-loading-text') || 'Отправка…';
+            } else if (btn._oldText != null) {
+                btn.textContent = btn._oldText;
+                btn._oldText = null;
+            }
         }
-    }, true)
+    });
+    if (on) {
+        form.dataset.locked = '1';
+    } else {
+        delete form.dataset.locked;
+    }
+    form.classList.toggle('is-submitting', !!on);
+}
+
+function gatePreSubmit(container, input) {
+    const form = container.querySelector('form');
+    if (!form) return;
+
+    // Помним, какой сабмиттер нажали
+    form.addEventListener('click', e => {
+        // Если уже залочено — гасим любые клики по сабмитам
+        if (form.dataset.locked === '1') {
+            const t = e.target;
+            if (t && (t.matches('button[type="submit"]') || t.matches('input[type="submit"]'))) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return;
+            }
+        }
+
+        const t = e.target;
+        if (t && (t.matches('button[type="submit"]') || t.matches('input[type="submit"]'))) {
+            form._submitter = t;
+        }
+    }, true);
 
     form.addEventListener('submit', async e => {
+        // Пропускаем "второй" сабмит после requestSubmit
         if (form.dataset.prepared === '1') {
-            delete form.dataset.prepared
-            return
+            delete form.dataset.prepared;
+            return;
         }
 
-        e.preventDefault()
-        e.stopImmediatePropagation()
+        // Если форма залочена — игнорим повторный сабмит (например, Enter)
+        if (form.dataset.locked === '1') {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+        }
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
 
         try {
-            const requiredContainers = form.querySelectorAll('[required-input="true"]')
-            const requiredInputs = Array.from(requiredContainers).map(c => c.querySelector('input'))
-            const emptyInputs = requiredInputs.filter(i => !i || i.value.trim() === '')
+            // Лочим и показываем загрузку
+            setSubmitting(form, true);
+
+            // Валидация обязательных
+            const requiredContainers = form.querySelectorAll('[required-input="true"]');
+            const requiredInputs = Array.from(requiredContainers).map(c => c.querySelector('input'));
+            const emptyInputs = requiredInputs.filter(i => !i || i.value.trim() === '');
             if (emptyInputs.length > 0) {
-                console.warn('Заполнены не все обязательные поля!')
-                return
+                console.warn('Заполнены не все обязательные поля!');
+                setSubmitting(form, false);
+                return;
             }
 
-            const name = form.querySelector('[form-input="name"] input')?.value || ''
-            const phone = (form.querySelector('[form-input="phone"] input')?.value || '').replace(/\D/g, '')
-            const url = window.location.href
-            const cookie = document.cookie
+            const name = form.querySelector('[form-input="name"] input')?.value || '';
+            const phone = (form.querySelector('[form-input="phone"] input')?.value || '').replace(/\D/g, '');
+            const url = window.location.href;
+            const cookie = document.cookie;
 
-            const successReady = waitForClass(container, 'is-success', 20000).catch(() => false)
-            const payload = await fetchCustomerPayload({ name, phone, url, cookie })
+            // Ждём успех формы (как и раньше)
+            const successReady = waitForClass(container, 'is-success', 20000).catch(() => false);
 
-            applyValuesToInputs(input, payload)
+            // Твои async-запросы
+            const payload = await fetchCustomerPayload({ name, phone, url, cookie });
 
-            form.dataset.prepared = '1'
-            form.requestSubmit(form._submitter)
+            // Проставляем значения в скрытые инпуты
+            applyValuesToInputs(input, payload);
 
-            const ok = await successReady
+            // Разрешаем реальный сабмит и триггерим его
+            form.dataset.prepared = '1';
+            form.requestSubmit(form._submitter);
+
+            // Если успех — редирект (кнопку можно не разблокировать — сейчас уйдём со страницы)
+            const ok = await successReady;
             if (ok) {
                 const linkRedirect = buildRedirectURL(container, {
                     isFraud: payload.isFraud,
                     isLocalDuplicate: payload.isLocalDuplicate,
                     isGlobalDuplicate: payload.isGlobalDuplicate
-                })
-                window.location.href = linkRedirect
+                });
+                // На время навигации кнопка остаётся disabled — это предотвращает повторные клики
+                window.location.href = linkRedirect;
+                return;
             }
+
+            // Не дождались успеха — снимаем лок, чтобы пользователь мог повторить
+            setSubmitting(form, false);
         } catch (err) {
-            console.warn('Pre-submit error (soft):', err?.message || err)
+            console.warn('Pre-submit error (soft):', err?.message || err);
+            setSubmitting(form, false);
         }
-    }, true)
+    }, true);
 }
