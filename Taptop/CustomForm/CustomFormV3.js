@@ -7,10 +7,12 @@ containers.forEach(container => {
     const containerClass = container.className
     const attrRedirect = container.getAttribute('redirect')
     const attrWebhook = container.getAttribute('webhook')
+    const attrCaptchaStep = container.getAttribute('captcha-step') // values: before, after, inside, random
 
     clonedContainer.className = containerClass
     if (attrRedirect !== null) clonedContainer.setAttribute('redirect', attrRedirect)
     if (attrWebhook !== null) clonedContainer.setAttribute('webhook', attrWebhook)
+    if (attrCaptchaStep !== null) clonedContainer.setAttribute('captcha-step', attrCaptchaStep)
     
     container.parentNode.insertBefore(clonedContainer, container.nextSibling)
     clonedContainer.querySelector('re-captcha').remove()
@@ -23,7 +25,7 @@ function addForm(container) {
     const form = container.querySelector('form')
 
     overwriteFields(form)
-    addCaptcha(form)
+    addCaptcha(container)
     overwriteSubmit(form)
     getMask(form)
 
@@ -60,20 +62,26 @@ function overwriteFields(form) {
     })
 }
 
-function addCaptcha(form) {
+function addCaptcha(container) {
+    const form = container.querySelector('form')
+    const captchaStep = container.getAttribute('captcha-step')
+
     const input = form.querySelector('input')
     const containerClass = input.parentElement.className
     const inputClass = input.className
+
+    const inputs = form.querySelectorAll('input')
+
+    if (captchaStep === 'before') inputs.forEach(input => {
+        const parent = input.parentElement.style('display: none')
+    })
+
     const style = 'display: none'
 
     const questions = [
         {
             question: 'Сколько будет 2+3?',
             answer: '5'
-        },
-        {
-            question: 'Сколько будет 4+3?',
-            answer: '7'
         },
         {
             question: 'Сколько будет 7+1?',
@@ -200,7 +208,7 @@ function captchaVerification(form) {
         if (answer !== value) {
             const attempts = parseInt(input.getAttribute('attempts'), 10)
 
-            if (attempts >= 2) {
+            if (attempts >= 4) {
                 console.log('Капча провалена!') // End
 
                 input.disabled = true
