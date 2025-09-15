@@ -6,11 +6,13 @@ containers.forEach(container => {
 
     const containerClass = container.className
     const attrRedirect = container.getAttribute('redirect')
+    const attrRedirectProxy = container.getAttribute('redirect-proxy')
     const attrWebhook = container.getAttribute('webhook')
     const attrCaptchaStep = container.getAttribute('captcha-step') // values: before, after, inside, random
 
     clonedContainer.className = containerClass
     if (attrRedirect !== null) clonedContainer.setAttribute('redirect', attrRedirect)
+    if (attrRedirectProxy !== null) clonedContainer.setAttribute('redirect-proxy', attrRedirectProxy)
     if (attrWebhook !== null) clonedContainer.setAttribute('webhook', attrWebhook)
     if (attrCaptchaStep !== null) clonedContainer.setAttribute('captcha-step', attrCaptchaStep)
     
@@ -186,10 +188,10 @@ function onSubmit(container, dataCaptcha) {
         try {
             const lead = await buildLead(form)
             const redirectURL = buildRedirectURL(container, lead)
-            const webhookRes = await sendWebhook(container, lead)
+            // const webhookRes = await sendWebhook(container, lead)
 
-            // console.log(lead) // DEV
-            // console.log(redirectURL) // DEV
+            console.log(lead) // DEV
+            console.log(redirectURL) // DEV
             // console.log(webhookRes) // DEV
 
             window.location.href = redirectURL
@@ -309,25 +311,20 @@ async function buildLead(form) {
     const values = getValues(form)
     const pageData = getPageData(form)
 
-    const { ip: userIp } = await fetch('https://api64.ipify.org?format=json').then(r => r.json())
-    const userAgent = navigator.userAgent
-    const userPlatform = navigator.platform
-    const userLanguage = navigator.language
-    const userVendor = navigator.vendor
-
     const name = values?.name
     const phone = values?.phone ? values.phone.replace(/\D/g, '') : ''
 
     // const customer = 'test' // DEV
-    const customer = await fetch('https://api.onycs.ru/customers', {
+    const response = await fetch('https://api-onycs.ru.tuna.am/leads', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-Full-URL': window.location.href,
+            'X-Cookies': document.cookie
+        },
         body: JSON.stringify({
             name, 
-            phone, 
-            url: url, 
-            cookie: cookie, 
-            ip: userIp
+            phone
         })
     }).then(r => r.json())
 
@@ -338,14 +335,11 @@ async function buildLead(form) {
         cookie,
         params,
         cookies,
+        data: response.data,
+        evaluation: response.evaluation,
+        duplicates: response.duplicates,
         values,
-        customer,
         page_data: pageData,
-        user_ip: userIp,
-        user_agent: userAgent,
-        user_platform: userPlatform,
-        user_language: userLanguage,
-        user_vendor: userVendor
     }
 
     return lead
@@ -354,19 +348,23 @@ async function buildLead(form) {
 function buildRedirectURL(container, lead) {
     const domain = new URL(window.location.href).hostname
     const pageRedirect = container.getAttribute('redirect') || '/'
+    const pageRedirectProxy = container.getAttribute('redirect-proxy') || '/error-proxy'
     const page = window.location.pathname.split('/').pop() || ''
     const linkRedirect = 'https://' + domain + pageRedirect
+    const linkRedirectProxy = 'https://' + domain + pageRedirectProxy
 
-    const { customer } = lead
-    const isFraud = customer?.is_fraud || false 
-    const isLocalDuplicate = customer?.is_local_duplicate || false 
-    const isGlobalDuplicate = customer?.is_global_duplicate || false 
+    const { evaluation, data } = lead
+    const isFraud = evaluation?.is_fraud || false 
+    const isLocalDuplicate = data?.is_local_duplicate || false 
+    const isGlobalDuplicate = data?.is_global_duplicate || false 
 
-    const redirect = linkRedirect + 
+    let redirect = linkRedirect + 
         `?in_success=${encodeURIComponent(page)}` +
         `&is_fraud=${encodeURIComponent(isFraud)}` +
         `&is_local_duplicate=${encodeURIComponent(isLocalDuplicate)}` +
         `&is_global_duplicate=${encodeURIComponent(isGlobalDuplicate)}`
+
+    if (evaluation?.reason.includes('Connection is not from Russia!')) redirect = linkRedirectProxy
 
     return redirect
 }
