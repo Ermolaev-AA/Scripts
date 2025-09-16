@@ -188,11 +188,11 @@ function onSubmit(container, dataCaptcha) {
         try {
             const lead = await buildLead(form)
             const redirectURL = buildRedirectURL(container, lead)
-            // const webhookRes = await sendWebhook(container, lead)
+            const webhookRes = await sendWebhook(container, lead)
 
             console.log(lead) // DEV
             console.log(redirectURL) // DEV
-            // console.log(webhookRes) // DEV
+            console.log(webhookRes) // DEV
 
             window.location.href = redirectURL
         } finally {
@@ -315,7 +315,7 @@ async function buildLead(form) {
     const phone = values?.phone ? values.phone.replace(/\D/g, '') : ''
 
     // const customer = 'test' // DEV
-    const response = await fetch('https://api-onycs.ru.tuna.am/leads', {
+    const response = await fetch('https://api.onycs.ru/leads', {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -328,6 +328,12 @@ async function buildLead(form) {
         })
     }).then(r => r.json())
 
+    const evaluation = {
+        is_fraud: response.evaluation.is_fraud,
+        reason_str: Array.isArray(response.evaluation.reason) ? response.evaluation.reason.join(', ') : response.evaluation.reason,
+        reason: response.evaluation.reason
+    }
+
     const lead = {
         url,
         domain,
@@ -336,7 +342,7 @@ async function buildLead(form) {
         params,
         cookies,
         data: response.data,
-        evaluation: response.evaluation,
+        evaluation,
         duplicates: response.duplicates,
         values,
         page_data: pageData,
