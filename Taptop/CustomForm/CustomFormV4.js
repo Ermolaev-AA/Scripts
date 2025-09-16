@@ -321,7 +321,7 @@ async function buildLead(form) {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
-            'x-forwarded-for': userIp,
+            'X-Client-IP': userIp,
             'X-Full-URL': window.location.href,
             'X-Cookies': document.cookie
         },
