@@ -190,9 +190,9 @@ function onSubmit(container, dataCaptcha) {
             const redirectURL = buildRedirectURL(container, lead)
             const webhookRes = await sendWebhook(container, lead)
 
-            console.log(lead) // DEV
-            console.log(redirectURL) // DEV
-            console.log(webhookRes) // DEV
+            // console.log(lead) // DEV
+            // console.log(redirectURL) // DEV
+            // console.log(webhookRes) // DEV
 
             window.location.href = redirectURL
         } finally {
