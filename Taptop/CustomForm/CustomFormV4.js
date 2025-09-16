@@ -314,11 +314,14 @@ async function buildLead(form) {
     const name = values?.name
     const phone = values?.phone ? values.phone.replace(/\D/g, '') : ''
 
+    const { ip: userIp } = await fetch('https://api64.ipify.org?format=json').then(r => r.json())
+
     // const customer = 'test' // DEV
     const response = await fetch('https://api.onycs.ru/leads', {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
+            'x-forwarded-for': userIp,
             'X-Full-URL': window.location.href,
             'X-Cookies': document.cookie
         },
