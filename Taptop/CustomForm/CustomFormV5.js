@@ -332,9 +332,15 @@ async function buildLead(form) {
     }).then(r => r.json())
 
     const evaluation = {
-        is_fraud: response.evaluation.is_fraud,
-        reason_str: Array.isArray(response.evaluation.reason) ? response.evaluation.reason.join(', ') : response.evaluation.reason,
-        reason: response.evaluation.reason
+        is_fraud: false,
+        reason_str: 'Server error OnycsAPI',
+        reason: [ 'Server error OnycsAPI' ]
+    }
+
+    if (response) {
+        evaluation.is_fraud = response.evaluation.is_fraud
+        evaluation.reason_str = Array.isArray(response.evaluation.reason) ? response.evaluation.reason.join(', ') : response.evaluation.reason
+        evaluation.reason = response.evaluation.reason
     }
 
     const lead = {
