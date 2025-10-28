@@ -124,8 +124,6 @@ async function onSubmit(container, config) {
         controls.forEach(el => el.disabled = true)
 
         try {
-            // console.log('Submit!')
-
             const lead = await buildLead(form, Config, resultVerifyCaptcha)
             ym(config?.YMID,'reachGoal','submitted_form')
 
@@ -142,8 +140,6 @@ async function onSubmit(container, config) {
             form.setAttribute('style', 'display: none') 
             containerSuccess.setAttribute('style', 'display: block') 
 
-            // console.log(containerSuccess)
-
             if (config?.Redirect?.Enabled) window.location.href = redirectURL
         } catch (error) {
             const containerError = container.querySelector('.form__state-error')
@@ -157,11 +153,6 @@ async function onSubmit(container, config) {
             controls.forEach(el => el.disabled = false)
             submitText.textContent = submitTextDefault
         }
-        // тут
-
-        // const lead = await buildLead(form)
-
-        // console.log(lead)
     })
 }
 
@@ -183,9 +174,9 @@ async function buildLead(form, config, captchaData) {
     const name = values?.name
     const phone = values?.phone ? values.phone.replace(/\D/g, '') : ''
 
+    // Получаем IP
     const { ip: userIp } = await fetch('https://api64.ipify.org?format=json').then(r => r.json())
 
-    // const customer = 'test' // DEV
     const link = `${config.InternalAPI}/leads`
     const options = {
         method: 'POST',
@@ -208,7 +199,26 @@ async function buildLead(form, config, captchaData) {
         })
     }
 
-    const response = await fetch(link, options).then(r => r.json())
+    // Критично: проверяем HTTP статус и выбрасываем ошибку
+    const res = await fetch(link, options)
+    if (!res.ok) {
+        const text = await res.text().catch(() => '')
+        throw new Error(`OnycsAPI HTTP ${res.status}: ${text}`)
+    }
+
+    let response
+    try {
+        response = await res.json()
+    } catch {
+        throw new Error('OnycsAPI вернул некорректный JSON')
+    }
+
+    // Дополнительно: если бэкенд вернул семантическую ошибку — тоже бросаем
+    if (response?.error || response?.success === false) {
+        const reason = response?.message || response?.error_reason || 'Server error OnycsAPI'
+        throw new Error(reason)
+    }
+
     const fraudMetadata = {
         is_fraud: response?.is_fraud || false,
         verify_enabled: response?.fraud_metadata?.verify_enabled || null,
@@ -217,8 +227,6 @@ async function buildLead(form, config, captchaData) {
         error_reason: Array.isArray(response?.fraud_metadata?.error_reason) ? response?.fraud_metadata?.error_reason.join(', ') : response?.fraud_metadata?.error_reason || 'Server error OnycsAPI',
         error_reason_arr: response?.fraud_metadata?.error_reason || [ 'Server error OnycsAPI' ]
     }
-
-    // console.log(response)
 
     const lead = {
         url,
