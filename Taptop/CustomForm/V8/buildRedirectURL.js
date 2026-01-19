@@ -4,8 +4,6 @@ export const buildRedirectURL = (container, config) => {
     const Config = EAConfig?.CustomForm || config
     
     const strRedirect = Config?.Redirect?.Link || container.getAttribute('redirect') || '/success'
-    if (strRedirect == 'dynamic') return container.querySelector('[variable="dynamic-redirect"] span').textContent
-    
     const linkRedirect = normalizeRedirectLink(strRedirect)
 
     const strRedirectProxy = Config?.RedirectIfProxy?.Link || container.getAttribute('redirect-proxy') || '/error-proxy'

@@ -1,69 +1,85 @@
 // This Config! Move it to the HEAD!
-// const EAConfig = {
-//     CustomForm: {
-//         // ScopeApplication: 'All Forms',
-//         Redirect: { 
-//             Enabled: true, 
-//             Link: 'https://ownstone.ru/' // Можно использовать значение 'dynamic', если существует document.querySelector('[variable="dynamic-redirect"] span').textContent
-//         },
-//         RedirectIfError: { Enabled: false, Link: '/error' },
-//         RedirectIfProxy: { Enabled: false, Link: '/error-proxy' },
-//         DefaultTextError: 'Что-то не так. Попробуйте через 2 минуты',
-//         FraudRules: {
-//             captcha_required: true, // Обязательно успешное прохождение капчи (true/false)
-//             valid_ip_required: true, // Обязательно валидный IP адрес пользователя (true/false), то есть IPv4
-//             valid_phone_required: true, // Обязательно валидный номер телефона (true/false) // DEV
-//             whatsapp_required: true, // Обязательно должен существовать whatsapp (true/false)
-//             telegram_required: false, // Обязательно должен существовать telegram (true/false)
-//             page_time: 0, // Время нахождения на странице (ms)
-//             focus_time: 0, // Суммарно время заполнения формы (ms)
-//             // Обязательно локально уникальный лид, те не имеет дублей внутри компании. Cравнивается: owner_id, phone, yclid, _ym_uid
-//             local_duplicates_allowed: { 
-//                 quantity: 0, // Количество лидов, при нахождении которых не будет возникать ошибки (0 шт)
-//                 ttl: 5443200000 // Промежуток времени от даты запроса, по которому будет осуществляться поиск (9 нед) (ms)
-//             },
-//             // Обязательно глобально уникальный лид, те вообще не имеет дублей. Cравнивается: phone, yclid, _ym_uid
-//             global_duplicates_allowed: {
-//                 quantity: 9, // Количество лидов, при нахождении которых не будет возникать ошибки (10 шт)
-//                 ttl: 2592000000 // Промежуток времени от даты запроса, по которому будет осуществляться поиск (30 дней) (ms)
-//             },
-//             ip_unique_ttl: 1814400000, // Время уникальности IP адреса пользователя (ms) (3 нед), проверка осуществляется на компанию
-//             network_unique_ttl: 3628800000, // Время уникальности сети пользователя (ms) (6 нед), проверка осуществляется на компанию
-//             geo_whitelist: [ 'RU' ], // Вайтлист гео подключения (массив, ISO коды)
-//             phone_code_whitelist: [], // Вайтлист кодов номера телефона (массив), для ограничения по стране происхождения номера телефона // DEV
-//             phone_blacklist: [], // Блэклист номеров телефона (массив) // DEV
-//             ip_blacklist: [], // Блэклист айпишников (массив) // DEV
-//             as_blacklist: [], // Блэклист провайдеров (массив) // DEV
-//             utm_source_blacklist: [], // Блэклист ресурсов по переходу из который при создании параметра utm_source будет возникать ошибка (массив) // DEV
-//             allowed_failures: 0 // Количество игнорируемых ошибок при котором проверка на мошенечиские действия все равно будет проходить успешно // DEV
-//         },
-//         Captcha: {
-//             Enabled: true,
-//             Type: 'Cloudflare Turnstile', // values: Cloudflare Turnstile, Questions EA
-//             Cloudflare: {
-//                 SiteKey: '0x4AAAAAAB20vI22kymBmCJX',
-//                 CompanyID: '688b652770d49260494b5930',
-//                 SecretKey: '0x4AAAAAAB20vOXx5R_EYBelrjCnCv1t9s0' // НЕ БЕЗОПАСНО - засунуть на сервак!
-//             }
-//         },
-//         YMConversions: {
-//             YMID: 105180494,
-//             Filled: { Enabled: true, ID: 'filled' },
-//             Submitted: { Enabled: true, ID: 'submitted' },
-//             Identified: { Enabled: true, ID: 'identified' },
-//             Verified: { Enabled: true, ID: 'verified' },
-//             Untested: { Enabled: true, ID: 'untested' }
-//         },
-//         HandleFormWait: {
-//             TextDefault: 'Получить предложение',
-//             TextLoading: 'Пожалуйста, подождите...'
-//         },
-//         DEVMode: false,
-//         Webhook: 'https://h.albato.ru/wh/38/1lfhuc0/tfL4V9vDPPL2dp27jWldjRLC7rKTzo8e2vybGUSeNIk/',
-//         ErrorWebhook: { Enabled: false, Link: '' }, // Пока не работает
-//         InternalAPI: 'https://api.onycs.ru'
-//     }
-// }
+const EAConfig = {
+    CustomForm: {
+        // ScopeApplication: 'All Forms',
+        Redirect: { Enabled: false, Link: 'https://ownstone.ru/' },
+        RedirectIfError: { Enabled: false, Link: '/error' },
+        RedirectIfProxy: { Enabled: false, Link: '/error-proxy' },
+        DefaultTextError: 'Что-то не так. Попробуйте через 2 минуты',
+        FraudRules: {
+            captcha_required: true, // Обязательно успешное прохождение капчи (true/false)
+            valid_ip_required: true, // Обязательно валидный IP адрес пользователя (true/false), то есть IPv4
+            valid_phone_required: true, // Обязательно валидный номер телефона (true/false) // DEV
+            whatsapp_required: true, // Обязательно должен существовать whatsapp (true/false)
+            telegram_required: false, // Обязательно должен существовать telegram (true/false)
+            page_time: 0, // Время нахождения на странице (ms)
+            focus_time: 0, // Суммарно время заполнения формы (ms)
+            // Обязательно локально уникальный лид, те не имеет дублей внутри компании. Cравнивается: owner_id, phone, yclid, _ym_uid
+            local_duplicates_allowed: { 
+                quantity: 0, // Количество лидов, при нахождении которых не будет возникать ошибки (0 шт)
+                ttl: 5443200000 // Промежуток времени от даты запроса, по которому будет осуществляться поиск (9 нед) (ms)
+            },
+            // Обязательно глобально уникальный лид, те вообще не имеет дублей. Cравнивается: phone, yclid, _ym_uid
+            global_duplicates_allowed: {
+                quantity: 9, // Количество лидов, при нахождении которых не будет возникать ошибки (10 шт)
+                ttl: 2592000000 // Промежуток времени от даты запроса, по которому будет осуществляться поиск (30 дней) (ms)
+            },
+            ip_unique_ttl: 1814400000, // Время уникальности IP адреса пользователя (ms) (3 нед), проверка осуществляется на компанию
+            network_unique_ttl: 3628800000, // Время уникальности сети пользователя (ms) (6 нед), проверка осуществляется на компанию
+            geo_whitelist: [ 'RU' ], // Вайтлист гео подключения (массив, ISO коды)
+            phone_code_whitelist: [], // Вайтлист кодов номера телефона (массив), для ограничения по стране происхождения номера телефона // DEV
+            phone_blacklist: [], // Блэклист номеров телефона (массив) // DEV
+            ip_blacklist: [], // Блэклист айпишников (массив) // DEV
+            as_blacklist: [], // Блэклист провайдеров (массив) // DEV
+            utm_source_blacklist: [], // Блэклист ресурсов по переходу из который при создании параметра utm_source будет возникать ошибка (массив) // DEV
+            allowed_failures: 0 // Количество игнорируемых ошибок при котором проверка на мошенечиские действия все равно будет проходить успешно // DEV
+        },
+        Captcha: {
+            Enabled: true,
+            Type: 'Yandex SmartCaptcha', // values: Cloudflare Turnstile, Questions EA, Yandex SmartCaptcha
+            Cloudflare: {
+                SiteKey: '0x4AAAAAAB20vI22kymBmCJX',
+                CompanyID: '688b652770d49260494b5930',
+                SecretKey: '0x4AAAAAAB20vOXx5R_EYBelrjCnCv1t9s0' // НЕ БЕЗОПАСНО - засунуть на сервак!
+            },
+            Yandex: {
+                SiteKay: 'ysc1_saKymuPuYDHL0fIiJUmt3AQDDdkfTmJRQGhZpPaL2fe39a4c',
+                CompanyID: '688b652770d49260494b5930',
+                SecretKey: 123,
+            }
+        },
+        YMConversions: {
+            YMID: 105180494,
+            Filled: { Enabled: true, ID: 'filled' },
+            Submitted: { Enabled: true, ID: 'submitted' },
+            Identified: { Enabled: true, ID: 'identified' },
+            Verified: { Enabled: true, ID: 'verified' },
+            Untested: { Enabled: true, ID: 'untested' }
+        },
+        HandleFormWait: {
+            TextDefault: 'Получить предложение',
+            TextLoading: 'Пожалуйста, подождите...'
+        },
+        DEVMode: true,
+        Webhook: 'https://h.albato.ru/wh/38/1lfhuc0/tfL4V9vDPPL2dp27jWldjRLC7rKTzo8e2vybGUSeNIk/',
+        ErrorWebhook: { Enabled: false, Link: '' }, // Пока не работает
+        InternalAPI: 'https://api.onycs.ru'
+    }
+}
+
+// [ - ] Таймер время проведения на странице. Отправка данныйх на бек
+// [ - ] Таймер времени фокусировки полей. Отправка данныйх на бек
+// [ - ] Обработчик ошибок от бека и вывод кода ошибки и путь решения в error блок формы
+// [ - ] Этап с усилиным подверждением через код по смс / почте или коду в месседжере (желательно релизовать все способы)
+// [ - ] Генирация собственного cookie параметра для индетификации пользователя
+// [ - ] Проверка тайм зон по IP пользовтеля и устройству
+// [ - ] Мулти капчи и Yandex Капча Инвизибол
+// [ - ] Новая Яндекс конверся по пользователям которые прошли капчу
+// [ - ] Офлайн конверсии на воронку взят в работу и квалифицирован с ценной 5к
+// [ - ] Дефолтный конфиг проверки проверки который будет храниться на беке чтобы сложно было заревьюшить проверку + конфиги в настройках Компаний
+// [ - ] Переработать ответ Leads от сервера чтобы его нельзя было заревьюшить + перенести отправку albato запроса и бота на сервак тоже в целях безопасности
+// [ - ] Проверка на впн прокси и тд Казимир давал сервис
+// [ - ] Заебать казимира чтобы помог сконфигурировать Nginx чтобы забирать User IP с внутренего proxy сервера (чтобы убрать лишний запрос в теле и хедере)
 
 import { overwriteFields } from './overwriteFields.js'
 import { addCaptcha } from './addCaptcha.js'
@@ -189,7 +205,7 @@ async function onSubmit(container, config) {
             leadData.msg = buildMSG(leadData)
 
             const redirectURL = buildRedirectURL(container, Config)
-            const webhookRes = await sendWebhook(container, leadData, Config)
+            // const webhookRes = await sendWebhook(container, leadData, Config)
 
             if (config?.DEVMode) console.log(lead) // DEV
             if (config?.DEVMode) console.log(redirectURL) // DEV
