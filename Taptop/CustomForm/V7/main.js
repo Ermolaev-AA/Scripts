@@ -52,7 +52,9 @@
 //             Submitted: { Enabled: true, ID: 'submitted' },
 //             Identified: { Enabled: true, ID: 'identified' },
 //             Verified: { Enabled: true, ID: 'verified' },
-//             Untested: { Enabled: true, ID: 'untested' }
+//             Untested: { Enabled: true, ID: 'untested' },
+//             CaptchaSuccess: { Enabled: true, ID: 'captcha_success' },
+//             WASuccess: { Enabled: true, ID: 'wa_success' }
 //         },
 //         HandleFormWait: {
 //             TextDefault: 'Получить предложение',
@@ -161,6 +163,18 @@ async function onSubmit(container, config) {
             if (YMID && YMConversions?.Identified?.Enabled && YMConversions?.Identified?.ID) {
                 const captchaSuccess = leadData?.fraud_metadata?.verify?.find(v => v.name === 'captcha')?.success ?? false
                 const whatsappSuccess = leadData?.fraud_metadata?.verify?.find(v => v.name === 'whatsapp')?.success ?? false
+
+                if (captchaSuccess && YMConversions?.CaptchaSuccess) {
+                    ym(YMID, 'reachGoal', YMConversions?.CaptchaSuccess?.ID)
+                    YMConversionsData.CaptchaSuccess = true
+                    if (config?.DEVMode) console.log('CONV ::', 'CaptchaSuccess', `(${YMID}, 'reachGoal', '${YMConversions?.CaptchaSuccess?.ID}')`)
+                }
+
+                if (whatsappSuccess && YMConversions?.WASuccess) {
+                    ym(YMID, 'reachGoal', YMConversions?.WASuccess?.ID)
+                    YMConversionsData.WASuccess = true
+                    if (config?.DEVMode) console.log('CONV ::', 'WASuccess', `(${YMID}, 'reachGoal', '${YMConversions?.WASuccess?.ID}')`)
+                }
 
                 if (captchaSuccess && whatsappSuccess) {
                     ym(YMID, 'reachGoal', YMConversions?.Identified?.ID)
