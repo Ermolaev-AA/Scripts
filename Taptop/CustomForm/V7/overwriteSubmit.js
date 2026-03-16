@@ -7,6 +7,12 @@ export const overwriteSubmit = (form) => {
         <span>${text}</span>
     </button>`
 
-    form.insertAdjacentHTML('beforeend', newSubmit)
+    const fieldContainer = form.querySelector(`[field-container]`)
+    if (fieldContainer) {
+        fieldContainer.insertAdjacentHTML('beforeend', newSubmit)
+    } else {
+        form.insertAdjacentHTML('beforeend', newSubmit)
+    }
+
     submit.remove()
 }

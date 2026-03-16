@@ -23,7 +23,13 @@ export const overwriteFields = (form) => {
             <input name="${name}" type="${type}" placeholder="${placeholder}" class="${inputClass}" ${autocomplete ? `autocomplete="${autocomplete}"` : ''} required>
         </div>`
 
-        form.insertAdjacentHTML('beforeend', newField)
+        const fieldContainer = form.querySelector(`[field-container]`)
+        if (fieldContainer) {
+            fieldContainer.insertAdjacentHTML('beforeend', newField)
+        } else {
+            form.insertAdjacentHTML('beforeend', newField)
+        }
+
         input.parentElement.remove()
     })
 }
