@@ -98,7 +98,8 @@ containers.forEach(container => {
     if (attrCaptchaStep !== null) clonedContainer.setAttribute('captcha-step', attrCaptchaStep)
     
     container.parentNode.insertBefore(clonedContainer, container.nextSibling)
-    clonedContainer.querySelector('re-captcha').remove()
+    clonedContainer.querySelector('re-captcha')?.remove() // old taptop captcha (google captcha)
+    clonedContainer.querySelector('[name="smart-token"]')?.remove()
     container.remove()
 
     // addForm
