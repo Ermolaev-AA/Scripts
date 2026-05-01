@@ -27,6 +27,7 @@ export const buildMSG = (data) => {
     const yclid = `yclid: <code>${data?.params_obj?.yclid}</code>`
     const internalID = `Internal ID: <code>${data?.internal_id}</code>`
     const site = `Site: <a href="${data?.url}">${data?.domain}</a>`
+    const howСontact = `How to Contact: ${data?.fields_data?.['how-contact']}`
 
     let errorReasonPoints = ''
     const errorReasonArr = data?.fraud_metadata?.error_reason_arr
@@ -40,6 +41,7 @@ export const buildMSG = (data) => {
 
 ${name}
 ${phone}
+${howСontact}
 
 ${heading}
 ${description}

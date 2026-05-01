@@ -1,6 +1,9 @@
 import { overwriteFields } from './overwriteFields.js'
 import { addCaptcha } from './addCaptcha.js'
 import { overwriteSubmit } from './overwriteSubmit.js'
+
+import { overwriteForm } from './overwriteForm.js'
+
 import { getMask } from './getMask.js'
 import { verifyCaptcha } from './verifyCaptcha.js'
 import { buildLead } from './buildLead.js'
@@ -26,22 +29,18 @@ containers.forEach(container => {
     if (attrRedirect !== null) clonedContainer.setAttribute('redirect', attrRedirect)
     if (attrRedirectProxy !== null) clonedContainer.setAttribute('redirect-proxy', attrRedirectProxy)
     if (attrWebhook !== null) clonedContainer.setAttribute('webhook', attrWebhook)
-    if (attrCaptchaStep !== null) clonedContainer.setAttribute('captcha-step', attrCaptchaStep)
-    
+    if (attrCaptchaStep !== null) clonedContainer.setAttribute('captcha-step', attrCaptchaStep)    
+
     container.parentNode.insertBefore(clonedContainer, container.nextSibling)
     clonedContainer.querySelector('re-captcha')?.remove() // old taptop captcha (google captcha)
     clonedContainer.querySelector('[name="smart-token"]')?.remove()
     container.remove()
 
     // addForm
-    const form = clonedContainer.querySelector('form')
-    if (!form) return console.warn('Form not found!')
-
-    overwriteFields(form)
+    const form = overwriteForm(clonedContainer)
     if (Config.Captcha.Enabled === true) addCaptcha(clonedContainer, Config.Captcha)
-    overwriteSubmit(form)
-    getMask(form)
 
+    getMask(form)
     onSubmit(clonedContainer, Config)
 })
 
@@ -83,6 +82,8 @@ async function onSubmit(container, config) {
 
         try {
             const lead = await buildLead(form, Config, resultVerifyCaptcha)
+            if (config?.DEVMode) console.log(`CUSTOM FORM :: Форма успешно отправлена на сервер! [${new Date().toLocaleString('ru-RU')}]`)
+
             const leadData = lead?.data
             
             // YMConversions
@@ -136,6 +137,7 @@ async function onSubmit(container, config) {
 
             const redirectURL = buildRedirectURL(container, Config)
             const webhookRes = await sendWebhook(container, leadData, Config)
+            if (config?.DEVMode) console.log(`CUSTOM FORM :: Вебхук успешно отправлен! [${new Date().toLocaleString('ru-RU')}]`)
 
             if (config?.DEVMode) console.log(lead) // DEV
             if (config?.DEVMode) console.log(redirectURL) // DEV
