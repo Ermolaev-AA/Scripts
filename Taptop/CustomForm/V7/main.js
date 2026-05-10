@@ -37,8 +37,14 @@ containers.forEach(container => {
     container.remove()
 
     // addForm
-    const form = overwriteForm(clonedContainer)
+    // const form = overwriteForm(clonedContainer)
+
+    const form = clonedContainer.querySelector('form')
+    if (!form) return console.warn('Form not found!')
+    
+    overwriteFields(form)
     if (Config.Captcha.Enabled === true) addCaptcha(clonedContainer, Config.Captcha)
+    overwriteSubmit(form)
 
     getMask(form)
     onSubmit(clonedContainer, Config)
